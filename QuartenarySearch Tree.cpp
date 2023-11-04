@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <cassert>
+#include <typeinfo>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -23,6 +26,8 @@ class QuadTree
     QuadNode<T, Value> *root;
 
 public:
+    int isDeleted = 0;
+
     QuadTree() : root(nullptr) {}
 
     QuadTree(const std::vector<std::pair<T, Value>> &objects)
@@ -42,6 +47,11 @@ public:
     void remove(T key)
     {
         root = removeRecursive(root, key);
+        if(isDeleted)
+            cout << "Key " << key << " is deleted from the tree." << endl;
+        else
+            cout << "Key " << key << " is not available in the tree." << endl;
+        isDeleted = 0;
     }
 
     // Recursive insertion function
@@ -96,7 +106,7 @@ public:
             {
                 // Node has no children
                 delete node;
-                cout << "Key is deleted from the tree" << endl;
+                isDeleted = 1;
                 return nullptr;
             }
         }
@@ -107,6 +117,7 @@ public:
     // Find the minimum key in a subtree
     QuadNode<T, Value> *findMin(QuadNode<T, Value> *node)
     {
+        assert(node != nullptr && "Node cannot be null.");
         while (node->children[0] != nullptr)
         {
             node = node->children[0];
@@ -154,6 +165,14 @@ private:
     }
 };
 
+bool isInteger(const string &str)
+{
+    istringstream ss(str);
+    int n;
+    ss >> n;
+    return !ss.fail() && ss.eof();
+}
+
 int main()
 {
     try
@@ -161,8 +180,8 @@ int main()
         std::vector<std::pair<int, string>> initialObjects = {{5, "Ai"}, {1, "Bi"}, {22, "Ci"}, {25, "Ei"}, {12, "Fi"}, {35, "Gi"}, {10, "Hi"}};
         QuadTree<int, string> quadTree(initialObjects);
 
-        int flag = 1, choice, node;
-        string value;
+        int flag = 1;
+        int choice;
         while(flag == 1){
             cout << "1 for Insert" << endl;
             cout << "2 for Delete" << endl;
@@ -171,37 +190,60 @@ int main()
             cout << "5 for Exit" << endl;
             cout << "Enter the choice you want to select : ";
             cin >> choice;
+            assert(choice>=1 && choice<=5 && "The choice must be between 1 to 5.");
             switch(choice){
                 case 1:
+                {
+                    string value, node;
+                    int key;
                     cout << "Enter the node you want to insert: ";
                     cin >> node;
+                    assert(isInteger(node) && "The key must be an integer.");
+                    istringstream(node) >> key;
+                    assert(key >= 0 && "The key must be positive.");
                     cout << "Enter the value you want to insert: ";
                     cin >> value;
-                    quadTree.insert(node, value);
-                    cout << "After the process Pre-order traversal:" << endl;
+                    quadTree.insert(key, value);
+                    cout << "After the insertion Pre-order traversal:" << endl;
                     quadTree.printPreOrder();
                     break;
+                }
                 case 2:
+                {
+                    string nodeDelete;
+                    int keyDelete;
                     cout << "Enter the node you want to delete: ";
-                    cin >> node;
-                    quadTree.remove(node);
+                    cin >> nodeDelete;
+                    assert(isInteger(nodeDelete) && "The key must be an integer.");
+                    istringstream(nodeDelete) >> keyDelete;
+                    assert(keyDelete >= 0 && "The key must be positive.");
+                    quadTree.remove(keyDelete);
                     cout << "After the process Pre-order traversal:" << endl;
                     quadTree.printPreOrder();
                     break;
+                }
                 case 3:
+                {
                     cout << "Pre-order traversal:" << endl;
                     quadTree.printPreOrder();
                     break;
+                }
                 case 4:
+                {                    
                     cout << "Post-order traversal:" << endl;
                     quadTree.printPostOrder();
                     break;
+                }
                 case 5:
+                {                    
                     flag = 0;
                     break;
+                }
                 default:
-                    cout << "Entered wrong choice: " << endl;
+                {
+                    assert(false && "The choice must be between 1 to 5.");
                     break;
+                }
             }
         }
     }
