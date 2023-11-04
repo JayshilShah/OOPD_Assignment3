@@ -6,6 +6,16 @@
 
 using namespace std;
 
+// Custom exception for invalid input
+class InvalidInputException : public exception
+{
+public:
+    const char *what() const throw()
+    {
+        return "Invalid input. Please enter a valid choice.";
+    }
+};
+
 template <typename T, typename Value>
 struct QuadNode
 {
@@ -85,7 +95,7 @@ public:
             node->children[1] = removeRecursive(node->children[1], key);
         else if (key < 2 * node->key)
             node->children[2] = removeRecursive(node->children[2], key);
-        else //(key >= 2 * node->key)
+        else 
             node->children[3] = removeRecursive(node->children[3], key);
         if (node->key == key) 
         {
@@ -190,7 +200,12 @@ int main()
             cout << "5 for Exit" << endl;
             cout << "Enter the choice you want to select : ";
             cin >> choice;
-            assert(choice>=1 && choice<=5 && "The choice must be between 1 to 5.");
+            
+            if (choice < 1 || choice > 5)
+            {
+                throw InvalidInputException();
+            }
+
             switch(choice){
                 case 1:
                 {
@@ -198,9 +213,11 @@ int main()
                     int key;
                     cout << "Enter the node you want to insert: ";
                     cin >> node;
+
                     assert(isInteger(node) && "The key must be an integer.");
                     istringstream(node) >> key;
                     assert(key >= 0 && "The key must be positive.");
+
                     cout << "Enter the value you want to insert: ";
                     cin >> value;
                     quadTree.insert(key, value);
@@ -214,9 +231,11 @@ int main()
                     int keyDelete;
                     cout << "Enter the node you want to delete: ";
                     cin >> nodeDelete;
+
                     assert(isInteger(nodeDelete) && "The key must be an integer.");
                     istringstream(nodeDelete) >> keyDelete;
                     assert(keyDelete >= 0 && "The key must be positive.");
+
                     quadTree.remove(keyDelete);
                     cout << "After the process Pre-order traversal:" << endl;
                     quadTree.printPreOrder();
@@ -246,6 +265,11 @@ int main()
                 }
             }
         }
+    }
+    catch (const InvalidInputException &e)
+    {
+        cerr << "Exception: " << e.what() << endl;
+        return 1;
     }
     catch (const exception &e)
     {
