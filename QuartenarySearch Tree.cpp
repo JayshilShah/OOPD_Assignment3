@@ -16,6 +16,25 @@ public:
     }
 };
 
+class Address {
+public:
+    string street;
+    string city;
+
+    Address() {}
+    Address(string _street, string _city) : street(_street), city(_city) {}
+};
+
+class Person {
+public:
+    string name;
+    int age;
+    Address address;
+
+    Person() {}
+    Person(string _name, int _age, Address _address) : name(_name), age(_age), address(_address) {}
+};
+
 template <typename T, typename Value>
 struct QuadNode
 {
@@ -154,7 +173,7 @@ private:
         if (node == nullptr)
             return;
 
-        std::cout << node->key << " " << node->value << endl;
+        std::cout << node->key << " " << node->value.name << " " << node->value.age << " " << node->value.address.street << " " << node->value.address.city << endl;
         printPreOrderRecursive(node->children[0]);
         printPreOrderRecursive(node->children[1]);
         printPreOrderRecursive(node->children[2]);
@@ -171,7 +190,7 @@ private:
         printPostOrderRecursive(node->children[1]);
         printPostOrderRecursive(node->children[2]);
         printPostOrderRecursive(node->children[3]);
-        std::cout << node->key << " " << node->value << endl;
+        std::cout << node->key << " " << node->value.name << " " << node->value.age << " " << node->value.address.street << " " << node->value.address.city << endl;
     }
 };
 
@@ -187,8 +206,19 @@ int main()
 {
     try
     {
-        std::vector<std::pair<int, string>> initialObjects = {{5, "Ai"}, {1, "Bi"}, {22, "Ci"}, {25, "Ei"}, {12, "Fi"}, {35, "Gi"}, {10, "Hi"}};
-        QuadTree<int, string> quadTree(initialObjects);
+        // std::vector<std::pair<int, string>> initialObjects = {{5, "Ai"}, {1, "Bi"}, {22, "Ci"}, {25, "Ei"}, {12, "Fi"}, {35, "Gi"}, {10, "Hi"}};
+        // QuadTree<int, string> quadTree(initialObjects);
+
+        Address address1("123 Main St", "Surat");
+        Address address2("456 Oak St", "Vadodara");
+        Address address3("34 Alkapuri St", "Ahmedabad");
+
+        Person person1("John", 30, address1);
+        Person person2("Alice", 25, address2);
+        Person person3("Jay", 24, address3);
+
+        std::vector<std::pair<int, Person>> initialObjects = {{5, person1}, {1, person2}, {23, person3}};
+        QuadTree<int, Person> quadTree(initialObjects);
 
         int flag = 1;
         int choice;
@@ -209,8 +239,10 @@ int main()
             switch(choice){
                 case 1:
                 {
-                    string value, node;
+                    string node;
                     int key;
+                    Person value;
+
                     cout << "Enter the node you want to insert: ";
                     cin >> node;
 
@@ -218,8 +250,16 @@ int main()
                     istringstream(node) >> key;
                     assert(key >= 0 && "The key must be positive.");
 
-                    cout << "Enter the value you want to insert: ";
-                    cin >> value;
+                    cout << "Enter the name: ";
+                    cin >> value.name;
+                    cout << "Enter the age: ";
+                    cin >> value.age;
+                    cin.ignore();
+                    cout << "Enter the street: ";
+                    getline(cin, value.address.street);
+                    cout << "Enter the city: ";
+                    cin >> value.address.city;
+
                     quadTree.insert(key, value);
                     cout << "After the insertion Pre-order traversal:" << endl;
                     quadTree.printPreOrder();
